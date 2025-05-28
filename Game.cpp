@@ -31,7 +31,7 @@ GameState current_state = Playing;
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
-const int NUM_PLATFORMS = 3;
+const int NUM_PLATFORMS = 4;
 
 Platform platforms[NUM_PLATFORMS];
 
@@ -98,13 +98,13 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
         else if (current_level == 1)
         {
 
-            player = {100, 400, 0, 0, 40, 40, false}; // Changed width to 40
+            player = {-15, 400, 0, 0, 40, 40, false}; // Changed width to 40
 
 
         }
         else if (current_level == 2)
         {
-            player = {100, 300, 0, 0, 40, 40, false}; // Changed width to 40
+            player = {-15, 300, 0, 0, 40, 40, false}; // Changed width to 40
         }
         else if (current_level == 3)
         {
@@ -238,29 +238,29 @@ void load_level(int level,Goal &goal, Platform *platforms, int previous_goal_y)
     if (level == 1)
     {
 
-        goal = {730, 250, 28, 40};
+        goal = {772, 250, 28, 40};
 
-        platforms[0] = {0, 500, 180, 67};
-        platforms[1] = {350, 400, 180, 67};
-        platforms[2] = {650, 300, 180, 67};
+        platforms[0] = {-15, 500, 180, 67};
+        platforms[1] = {300, 400, 180, 67};
+        platforms[2] = {615, 300, 180, 67};
     }
     else if (level == 2)
     {
 
-        goal = {680, 200, 28, 40};
+        goal = {772, 200, 28, 40};
 
-        platforms[0] = {0, 300, 180, 67};
+        platforms[0] = {-15, 300, 180, 67};
         platforms[1] = {350, 350, 180, 67};
         platforms[2] = {650, 250, 180, 67};
     }
     else if (level == 3)
     {
 
-        goal = {720, 220, 28, 40};
+        goal = {772, 220, 28, 40};
 
-        platforms[0] = {0, 250, 180, 67};
+        platforms[0] = {-15, 250, 180, 67};
         platforms[1] = {300, 400, 180, 67};
-        platforms[2] = {600, 300, 180, 67};
+        platforms[2] = {615, 300, 180, 67};
     }
     else
     {
@@ -289,7 +289,7 @@ int main()
         play_music(game_music, true);  
      }
     Player player;
-    player = {100, 400, 0, 0, 40, 40, false}; // Changed width to 40
+    player = {-15, 400, 0, 0, 40, 40, false}; // Changed width to 40
     Goal   goal;
     Platform platforms[NUM_PLATFORMS];
 
@@ -310,7 +310,7 @@ int main()
             current_state = Playing;
             current_level = 1;            
             level_needs_loading = true; 
-            player = {100, 400, 0, 0, 40, 40, false}; // Changed width to 40        
+            player = {-15, 400, 0, 0, 40, 40, false}; // Changed width to 40        
         }
 
 
