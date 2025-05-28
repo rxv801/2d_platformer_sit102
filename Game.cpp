@@ -1,7 +1,7 @@
 #include "splashkit.h"
 using std::to_string;
 
-
+string text;
 int current_level = 1;
 bool level_needs_loading = true;
 struct Player
