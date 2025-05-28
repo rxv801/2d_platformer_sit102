@@ -98,17 +98,17 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
         else if (current_level == 1)
         {
 
-            player = {100, 400, 0, 0, 40, 40, false};
+            player = {100, 400, 0, 0, 40, 40, false}; // Changed width to 40
 
 
         }
         else if (current_level == 2)
         {
-            player = {100, 300, 0, 0, 40, 40, false};
+            player = {100, 300, 0, 0, 40, 40, false}; // Changed width to 40
         }
         else if (current_level == 3)
         {
-            player = {100, 200, 0, 0, 40, 40, false};
+            player = {100, 200, 0, 0, 40, 40, false}; // Changed width to 40
         }
     }    
 
@@ -130,28 +130,34 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
 
 void draw_game(const Player &player, const Platform *platforms, int platform_count, const Goal &goal)
 {
-
     draw_bitmap(bitmap_named("background"), 0, 0);
 
-    if(player.vx > 0)
+    if(player.vx > 0 && player.on_ground)
         draw_bitmap(bitmap_named("player_right"), player.x, player.y);
 
-    else if(player.vx < 0)
+    else if(player.vx < 0 && player.on_ground)
         draw_bitmap(bitmap_named("player_left"), player.x, player.y);
+    
+    else if(player.on_ground == false && player.vx > 0)
+        draw_bitmap(bitmap_named("player_in_air_right"), player.x, player.y);
+    else if(player.on_ground == false && player.vx < 0)
+        draw_bitmap(bitmap_named("player_in_air_left"), player.x, player.y);
+    
+    else if(player.on_ground == false && player.vx == 0) // Handle jumping straight up
+        draw_bitmap(bitmap_named("player_in_air_right"), player.x, player.y); // Use a neutral jumping image
     
     else
         draw_bitmap(bitmap_named("player_still"), player.x, player.y);
+
     for (int i = 0; i < platform_count; ++i)
     {
         draw_bitmap(bitmap_named("platform"), platforms[i].x, platforms[i].y-8);
     }
     
-    if(current_level==3)
+    if(current_level == 3)
     {
         draw_bitmap(bitmap_named("goal"), goal.x, goal.y+5);
     }
-
-
 }
 
 /**
@@ -212,13 +218,14 @@ void apply_physics(Player &p)
 
 void load_bitmaps()
 {
-    load_bitmap("platform", "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/D4/Resources/new_super_mario_bros_wii_conceptart_tKE4P Background Removed.png");
-    load_bitmap("goal", "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/D4/Resources/136-1366547_simple-sonic-clipart-image-checkpoint-flag-mariowiki-nintendo-switch-game-card-case Background Removed.png");
-    load_bitmap("player_right", "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/D4/Resources/pngimg.com - mario_PNG88.png");
-    load_bitmap("player_left", "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/D4/Resources/pngimg.com - mario_PNG88 copy.png");
-    load_bitmap("player_still", "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/D4/Resources/980-9809169_super-mario.png");
-    load_bitmap("background", "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/D4/Resources/the-skyboxes-of-super-mario-sunshine-are-beautiful-v0-mldawocl4wqe1.png");
-
+    load_bitmap("platform", "Resources/new_super_mario_bros_wii_conceptart_tKE4P Background Removed.png");
+    load_bitmap("goal", "Resources/136-1366547_simple-sonic-clipart-image-checkpoint-flag-mariowiki-nintendo-switch-game-card-case Background Removed.png");
+    load_bitmap("player_right", "Resources/pngimg.com - mario_PNG88.png");
+    load_bitmap("player_left", "Resources/pngimg.com - mario_PNG88 copy.png");
+    load_bitmap("player_still", "Resources/980-9809169_super-mario.png");
+    load_bitmap("background", "Resources/the-skyboxes-of-super-mario-sunshine-are-beautiful-v0-mldawocl4wqe1.png");
+    load_bitmap("player_in_air_right", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38.png"); //added jumping image
+    load_bitmap("player_in_air_left", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38 copy.png"); //added jumping image
 }
 
 
@@ -233,27 +240,27 @@ void load_level(int level,Goal &goal, Platform *platforms, int previous_goal_y)
 
         goal = {730, 250, 28, 40};
 
-        platforms[0] = {0, 500, 200, 67};
-        platforms[1] = {350, 400, 200, 67};
-        platforms[2] = {650, 300, 200, 67};
+        platforms[0] = {0, 500, 180, 67};
+        platforms[1] = {350, 400, 180, 67};
+        platforms[2] = {650, 300, 180, 67};
     }
     else if (level == 2)
     {
 
         goal = {680, 200, 28, 40};
 
-        platforms[0] = {0, 300, 200, 67};
-        platforms[1] = {350, 350, 200, 67};
-        platforms[2] = {650, 250, 200, 67};
+        platforms[0] = {0, 300, 180, 67};
+        platforms[1] = {350, 350, 180, 67};
+        platforms[2] = {650, 250, 180, 67};
     }
     else if (level == 3)
     {
 
         goal = {720, 220, 28, 40};
 
-        platforms[0] = {0, 250, 200, 67};
-        platforms[1] = {300, 400, 200, 67};
-        platforms[2] = {600, 300, 200, 67};
+        platforms[0] = {0, 250, 180, 67};
+        platforms[1] = {300, 400, 180, 67};
+        platforms[2] = {600, 300, 180, 67};
     }
     else
     {
@@ -276,13 +283,13 @@ int main()
     load_bitmaps();
     open_window("2D Platformer", SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    music game_music = load_music("background_music", "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/D4/Resources/super-mario-bros-music.mp3");
+    music game_music = load_music("background_music", "Resources/super-mario-bros-music.mp3");
     if(current_state == Playing)
      {      
         play_music(game_music, true);  
      }
     Player player;
-    player = {100, 400, 0, 0, 40, 40, false}; 
+    player = {100, 400, 0, 0, 40, 40, false}; // Changed width to 40
     Goal   goal;
     Platform platforms[NUM_PLATFORMS];
 
@@ -303,7 +310,7 @@ int main()
             current_state = Playing;
             current_level = 1;            
             level_needs_loading = true; 
-            player = {100, 400, 0, 0, 40, 40, false};        
+            player = {100, 400, 0, 0, 40, 40, false}; // Changed width to 40        
         }
 
 
