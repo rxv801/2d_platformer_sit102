@@ -10,6 +10,27 @@ struct Player
     bool on_ground;
 };
 
+// created an enemy struct to hold enemy properties
+struct Enemy
+{
+    int x, y, vx, vy, width, height;
+    bool on_ground;
+
+    int shadow_left_x, shadow_left_y;
+    int shadow_left_width, shadow_left_height;
+
+    int shadow_right_x, shadow_right_y;
+    int shadow_right_width, shadow_right_height;
+
+    // Default constructor to initialize properties
+    Enemy()
+        : x(0), y(0), vx(1), vy(0), width(40), height(40), on_ground(false),
+          shadow_left_x(0), shadow_left_y(0), shadow_left_width(2), shadow_left_height(2),
+          shadow_right_x(0), shadow_right_y(0), shadow_right_width(2), shadow_right_height(2)
+    {
+    }
+};
+
 struct Platform
 {
     int x, y, width, height;
@@ -32,12 +53,84 @@ GameState current_state = Playing;
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const int NUM_PLATFORMS = 4;
+const int NUM_ENEMIES = 1; // Define the number of enemies
 
 Platform platforms[NUM_PLATFORMS];
 
 bool aabb_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
     return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+}
+
+void handle_enemy(Enemy &e, const Platform *platforms, int platform_count, const Player &player)
+{
+    // Apply gravity to the enemy
+    e.vy += 1;
+    e.y += e.vy;
+
+    e.on_ground = false;
+
+    // Check collision with platforms
+    for (int i = 0; i < platform_count; ++i)
+    {
+        const Platform &plat = platforms[i];
+        if (aabb_collision(e.x, e.y, e.width, e.height, plat.x, plat.y, plat.width, plat.height))
+        {
+            if (e.vy >= 0)
+            {
+                e.y = plat.y - e.height;
+                e.vy = 0;
+                e.on_ground = true;
+            }
+        }
+    }
+
+    e.x += e.vx;
+
+    // Update shadow properties for collision detection
+    e.shadow_left_x = e.x - 2;
+    e.shadow_left_y = e.y + e.height;
+    e.shadow_left_width = 2;
+    e.shadow_left_height = 2;
+
+    e.shadow_right_x = e.x + e.width;
+    e.shadow_right_y = e.y + e.height;
+    e.shadow_right_width = 2;
+    e.shadow_right_height = 2;
+
+    bool left_on_platform = false;
+    bool right_on_platform = false;
+
+    // Check if shadows are on platforms
+    for (int i = 0; i < platform_count; ++i)
+    {
+        const Platform &plat = platforms[i];
+
+        if (aabb_collision(e.shadow_left_x, e.shadow_left_y, e.shadow_left_width, e.shadow_left_height, plat.x, plat.y, plat.width, plat.height))
+        {
+            left_on_platform = true;
+        }
+
+        if (aabb_collision(e.shadow_right_x, e.shadow_right_y, e.shadow_right_width, e.shadow_right_height, plat.x, plat.y, plat.width, plat.height))
+        {
+            right_on_platform = true;
+        }
+    }
+
+    // Reverse direction if one shadow is not on a platform
+    if (!left_on_platform || !right_on_platform)
+    {
+        e.vx = -e.vx;
+    }
+
+    // Game Over if enemy collides with the player
+    if (aabb_collision(e.x, e.y, e.width, e.height, player.x, player.y, player.width, player.height))
+    {
+        current_state = GameOver;
+    }
+
+    // Draw the enemy
+    fill_rectangle(COLOR_RED, e.x, e.y, e.width, e.height); // Render the enemy
 }
 
 void check_collisions(Player &player, Platform *platforms, int platform_count, Goal &goal)
@@ -56,7 +149,7 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
             }
         }
     }
-  
+
     if (aabb_collision(player.x, player.y, player.width, player.height, goal.x, goal.y, goal.width, goal.height))
     {
         level_needs_loading = true;
@@ -78,48 +171,53 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
         {
             player = {100, 200, 0, 0, 40, 40, false};
         }
-    }    
+    }
 }
 
-
-
-void draw_game(const Player &player, const Platform *platforms, int platform_count, const Goal &goal)
+void draw_game(const Player &player, const Platform *platforms, int platform_count, const Goal &goal, const Enemy &enemy)
 {
     draw_bitmap(bitmap_named("background"), 0, 0);
 
-    if(player.vx > 0 && player.on_ground)
+    for (int i = 0; i < NUM_ENEMIES; ++i)
+    {
+        fill_rectangle(COLOR_RED, enemy.x, enemy.y, enemy.width, enemy.height); // drew enemy for testing
+    }
+    if (player.vx > 0 && player.on_ground)
         draw_bitmap(bitmap_named("player_right"), player.x, player.y);
 
-    else if(player.vx < 0 && player.on_ground)
+    else if (player.vx < 0 && player.on_ground)
         draw_bitmap(bitmap_named("player_left"), player.x, player.y);
-    
-    else if(player.on_ground == false && player.vx > 0)
+
+    else if (player.on_ground == false && player.vx > 0)
         draw_bitmap(bitmap_named("player_in_air_right"), player.x, player.y);
-    else if(player.on_ground == false && player.vx < 0)
+    else if (player.on_ground == false && player.vx < 0)
         draw_bitmap(bitmap_named("player_in_air_left"), player.x, player.y);
-    
-    else if(player.on_ground == false && player.vx == 0)
+
+    else if (player.on_ground == false && player.vx == 0)
         draw_bitmap(bitmap_named("player_in_air_right"), player.x, player.y);
-    
+
     else
         draw_bitmap(bitmap_named("player_still"), player.x, player.y);
 
     for (int i = 0; i < platform_count; ++i)
     {
-        draw_bitmap(bitmap_named("platform"), platforms[i].x, platforms[i].y-8);
+        draw_bitmap(bitmap_named("platform"), platforms[i].x, platforms[i].y - 8);
     }
-    
-    if(current_level == 3)
+
+    if (current_level == 3)
     {
-        draw_bitmap(bitmap_named("goal"), goal.x, goal.y+5);
+        draw_bitmap(bitmap_named("goal"), goal.x, goal.y + 5);
     }
 }
 
 void handle_input(Player &p)
 {
-    if (key_down(LEFT_KEY))      p.vx = -5;
-    else if (key_down(RIGHT_KEY)) p.vx = 5;
-    else                          p.vx = 0;
+    if (key_down(LEFT_KEY))
+        p.vx = -5;
+    else if (key_down(RIGHT_KEY))
+        p.vx = 5;
+    else
+        p.vx = 0;
 
     if (key_typed(SPACE_KEY) && p.on_ground)
         p.vy = -15;
@@ -128,16 +226,20 @@ void handle_input(Player &p)
 void apply_physics(Player &p)
 {
     p.vy += 1;
-    p.y  += p.vy;
-    p.x  += p.vx;
+    p.y += p.vy;
+    p.x += p.vx;
 
-    if (p.x < 0) {p.x = 0;}
-    if (p.x + p.width > SCREEN_WIDTH)   p.x = SCREEN_WIDTH - p.width;
+    if (p.x < 0)
+    {
+        p.x = 0;
+    }
+    if (p.x + p.width > SCREEN_WIDTH)
+        p.x = SCREEN_WIDTH - p.width;
 
     if (p.y + p.height >= SCREEN_HEIGHT)
     {
         current_state = GameOver;
-        return; 
+        return;
     }
 }
 
@@ -153,11 +255,19 @@ void load_bitmaps()
     load_bitmap("player_in_air_left", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38 copy.png");
 }
 
-void load_level(int level, Goal &goal, Platform *platforms, int previous_goal_y)
+void load_level(int level, Goal &goal, Platform *platforms, Enemy *enemies)
 {
     if (level == 1)
     {
         goal = {772, 0, 28, 300};
+
+        enemies[0].x = 350;
+        enemies[0].y = 350;
+        enemies[0].vx = 1; // Set horizontal velocity to 1
+        enemies[0].vy = 0;
+        enemies[0].width = 40;
+        enemies[0].height = 40;
+        enemies[0].on_ground = false;
 
         platforms[0] = {-15, 500, 180, 67};
         platforms[1] = {300, 400, 180, 67};
@@ -167,6 +277,14 @@ void load_level(int level, Goal &goal, Platform *platforms, int previous_goal_y)
     {
         goal = {772, 0, 28, 300};
 
+        enemies[0].x = 450;
+        enemies[0].y = 350;
+        enemies[0].vx = 1; // Set horizontal velocity to 1
+        enemies[0].vy = 0;
+        enemies[0].width = 40;
+        enemies[0].height = 40;
+        enemies[0].on_ground = false;
+
         platforms[0] = {-15, 300, 180, 67};
         platforms[1] = {350, 350, 180, 67};
         platforms[2] = {650, 250, 180, 67};
@@ -174,6 +292,14 @@ void load_level(int level, Goal &goal, Platform *platforms, int previous_goal_y)
     else if (level == 3)
     {
         goal = {772, 220, 28, 40};
+
+        enemies[0].x = 500;
+        enemies[0].y = 200;
+        enemies[0].vx = 1; // Set horizontal velocity to 1
+        enemies[0].vy = 0;
+        enemies[0].width = 40;
+        enemies[0].height = 40;
+        enemies[0].on_ground = false;
 
         platforms[0] = {-15, 250, 180, 67};
         platforms[1] = {300, 400, 180, 67};
@@ -199,13 +325,18 @@ void handle_music(GameState state, music game_music)
 
 int main()
 {
+    // Declare and initialize enemies
+    Enemy enemies[NUM_ENEMIES];
+    enemies[0].x = 350;
+    enemies[0].y = 350;
+
     load_bitmaps();
     open_window("2D Platformer", SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    music game_music = load_music("background_music", "Resources/super-mario-bros-music.mp3");  
+    music game_music = load_music("background_music", "Resources/super-mario-bros-music.mp3");
     Player player;
     player = {-15, 400, 0, 0, 40, 40, false};
-    Goal   goal;
+    Goal goal;
     Platform platforms[NUM_PLATFORMS];
 
     while (!window_close_requested("2D Platformer"))
@@ -219,24 +350,32 @@ int main()
             handle_input(player);
             apply_physics(player);
             check_collisions(player, platforms, NUM_PLATFORMS, goal);
+
+            // Handle each enemy
+            for (int i = 0; i < NUM_ENEMIES; ++i)
+            {
+                handle_enemy(enemies[i], platforms, NUM_PLATFORMS, player);
+            }
         }
-        
+
         if (current_state == GameOver && key_typed(SPACE_KEY))
         {
             current_state = Playing;
-            current_level = 1;            
-            level_needs_loading = true; 
+            current_level = 1;
+            level_needs_loading = true;
             player = {-15, 400, 0, 0, 40, 40, false};
         }
 
         if (level_needs_loading)
         {
-            load_level(current_level, goal, platforms, goal.y);
+            load_level(current_level, goal, platforms, enemies);
             level_needs_loading = false;
         }
 
         clear_screen(COLOR_SKY_BLUE);
-        draw_game(player, platforms, NUM_PLATFORMS, goal);
+
+        draw_game(player, platforms, NUM_PLATFORMS, goal, enemies[0]);
+
 
         if (current_state == Win)
             draw_text("You Win!", COLOR_BLACK, "Arial", 256, 330, 250);
