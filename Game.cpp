@@ -35,39 +35,10 @@ const int NUM_PLATFORMS = 4;
 
 Platform platforms[NUM_PLATFORMS];
 
-/**
- * @brief Detects collision between two axis-aligned rectangles using AABB logic.
- * 
- * @param x1 X position of the first rectangle
- * @param y1 Y position of the first rectangle
- * @param w1 Width of the first rectangle
- * @param h1 Height of the first rectangle
- * @param x2 X position of the second rectangle
- * @param y2 Y position of the second rectangle
- * @param w2 Width of the second rectangle
- * @param h2 Height of the second rectangle
- * @return true if the rectangles overlap, false otherwise
- */
-
 bool aabb_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
     return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
 }
-
-/**
- * @brief Checks and handles collisions between the player, platforms, and the goal.
- * 
- * This function updates the player's grounded state by checking for collisions 
- * with all platforms. If the player is falling and collides with a platform, 
- * their vertical velocity is reset and they are marked as on the ground.
- * 
- * It also checks if the player reaches the goal, and updates the game state to Win.
- * 
- * @param player Reference to the Player object being checked for collisions.
- * @param platforms Pointer to the array of Platform objects.
- * @param platform_count Number of platforms in the array.
- * @param goal Reference to the Goal object to check for level completion.
- */
 
 void check_collisions(Player &player, Platform *platforms, int platform_count, Goal &goal)
 {
@@ -97,36 +68,20 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
         }
         else if (current_level == 1)
         {
-
-            player = {-15, 400, 0, 0, 40, 40, false}; // Changed width to 40
-
-
+            player = {-15, 400, 0, 0, 40, 40, false};
         }
         else if (current_level == 2)
         {
-            player = {-15, 300, 0, 0, 40, 40, false}; // Changed width to 40
+            player = {-15, 300, 0, 0, 40, 40, false};
         }
         else if (current_level == 3)
         {
-            player = {100, 200, 0, 0, 40, 40, false}; // Changed width to 40
+            player = {100, 200, 0, 0, 40, 40, false};
         }
     }    
-
 }
 
 
-/**
- * @brief Draws all game elements including background, player, platforms, and goal.
- *
- * This function handles rendering of the entire game screen. It draws the background first,
- * then selects the appropriate player sprite based on movement direction (left, right, or idle),
- * followed by rendering each platform and the goal object.
- *
- * @param player The player object containing position, velocity, and size.
- * @param platforms Array of platforms to be drawn in the scene.
- * @param platform_count The total number of platforms in the array.
- * @param goal The goal object to be drawn at the end of the level.
- */
 
 void draw_game(const Player &player, const Platform *platforms, int platform_count, const Goal &goal)
 {
@@ -143,8 +98,8 @@ void draw_game(const Player &player, const Platform *platforms, int platform_cou
     else if(player.on_ground == false && player.vx < 0)
         draw_bitmap(bitmap_named("player_in_air_left"), player.x, player.y);
     
-    else if(player.on_ground == false && player.vx == 0) // Handle jumping straight up
-        draw_bitmap(bitmap_named("player_in_air_right"), player.x, player.y); // Use a neutral jumping image
+    else if(player.on_ground == false && player.vx == 0)
+        draw_bitmap(bitmap_named("player_in_air_right"), player.x, player.y);
     
     else
         draw_bitmap(bitmap_named("player_still"), player.x, player.y);
@@ -160,17 +115,6 @@ void draw_game(const Player &player, const Platform *platforms, int platform_cou
     }
 }
 
-/**
- * @brief Handles keyboard input to control the player's movement.
- * 
- * Sets the player's horizontal velocity based on left/right key presses.
- * If the spacebar is pressed and the player is on the ground, a jump is triggered
- * by applying an upward vertical velocity.
- * 
- * @param p Reference to the Player object whose movement will be controlled.
- */
-
-
 void handle_input(Player &p)
 {
     if (key_down(LEFT_KEY))      p.vx = -5;
@@ -181,24 +125,12 @@ void handle_input(Player &p)
         p.vy = -15;
 }
 
-/**
- * @brief Applies basic physics to the player, including gravity and boundary constraints.
- * 
- * Updates the player's position based on current velocity. Applies gravity by incrementing
- * vertical velocity. Ensures the player stays within horizontal screen bounds and checks 
- * if the player has fallen below the screen, which triggers a game over.
- * 
- * @param p Reference to the Player object whose physics will be applied.
- */
-
 void apply_physics(Player &p)
 {
-
     p.vy += 1;
     p.y  += p.vy;
     p.x  += p.vx;
 
-    
     if (p.x < 0) {p.x = 0;}
     if (p.x + p.width > SCREEN_WIDTH)   p.x = SCREEN_WIDTH - p.width;
 
@@ -209,13 +141,6 @@ void apply_physics(Player &p)
     }
 }
 
-/**
- * @brief Loads all bitmap resources used in the game.
- * 
- * This function should be called once at the start of the game to ensure all
- * necessary images are available for rendering the player, platforms, goal, and background.
- */
-
 void load_bitmaps()
 {
     load_bitmap("platform", "Resources/new_super_mario_bros_wii_conceptart_tKE4P Background Removed.png");
@@ -224,21 +149,15 @@ void load_bitmaps()
     load_bitmap("player_left", "Resources/pngimg.com - mario_PNG88 copy.png");
     load_bitmap("player_still", "Resources/980-9809169_super-mario.png");
     load_bitmap("background", "Resources/the-skyboxes-of-super-mario-sunshine-are-beautiful-v0-mldawocl4wqe1.png");
-    load_bitmap("player_in_air_right", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38.png"); //added jumping image
-    load_bitmap("player_in_air_left", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38 copy.png"); //added jumping image
+    load_bitmap("player_in_air_right", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38.png");
+    load_bitmap("player_in_air_left", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38 copy.png");
 }
 
-
-
-
-void load_level(int level,Goal &goal, Platform *platforms, int previous_goal_y)
+void load_level(int level, Goal &goal, Platform *platforms, int previous_goal_y)
 {
-
-
     if (level == 1)
     {
-
-        goal = {772, 250, 28, 40};
+        goal = {772, 0, 28, 300};
 
         platforms[0] = {-15, 500, 180, 67};
         platforms[1] = {300, 400, 180, 67};
@@ -246,8 +165,7 @@ void load_level(int level,Goal &goal, Platform *platforms, int previous_goal_y)
     }
     else if (level == 2)
     {
-
-        goal = {772, 200, 28, 40};
+        goal = {772, 0, 28, 300};
 
         platforms[0] = {-15, 300, 180, 67};
         platforms[1] = {350, 350, 180, 67};
@@ -255,7 +173,6 @@ void load_level(int level,Goal &goal, Platform *platforms, int previous_goal_y)
     }
     else if (level == 3)
     {
-
         goal = {772, 220, 28, 40};
 
         platforms[0] = {-15, 250, 180, 67};
@@ -268,35 +185,34 @@ void load_level(int level,Goal &goal, Platform *platforms, int previous_goal_y)
     }
 }
 
-/**
- * @brief Main game loop for the 2D platformer.
- * 
- * Sets up the game window, initializes game objects, processes input,
- * updates game logic, and renders the current state in a loop until the window is closed.
- * 
- * @return Exit status code.
- */
+void handle_music(GameState state, music game_music)
+{
+    if (state == Playing && !music_playing())
+    {
+        play_music(game_music, true);
+    }
+    else if (state != Playing && music_playing())
+    {
+        stop_music();
+    }
+}
 
 int main()
 {
-
     load_bitmaps();
     open_window("2D Platformer", SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    music game_music = load_music("background_music", "Resources/super-mario-bros-music.mp3");
-    if(current_state == Playing)
-     {      
-        play_music(game_music, true);  
-     }
+    music game_music = load_music("background_music", "Resources/super-mario-bros-music.mp3");  
     Player player;
-    player = {-15, 400, 0, 0, 40, 40, false}; // Changed width to 40
+    player = {-15, 400, 0, 0, 40, 40, false};
     Goal   goal;
     Platform platforms[NUM_PLATFORMS];
-
 
     while (!window_close_requested("2D Platformer"))
     {
         process_events();
+
+        handle_music(current_state, game_music);
 
         if (current_state == Playing)
         {
@@ -310,9 +226,8 @@ int main()
             current_state = Playing;
             current_level = 1;            
             level_needs_loading = true; 
-            player = {-15, 400, 0, 0, 40, 40, false}; // Changed width to 40        
+            player = {-15, 400, 0, 0, 40, 40, false};
         }
-
 
         if (level_needs_loading)
         {
@@ -322,13 +237,9 @@ int main()
 
         clear_screen(COLOR_SKY_BLUE);
         draw_game(player, platforms, NUM_PLATFORMS, goal);
-         
 
         if (current_state == Win)
             draw_text("You Win!", COLOR_BLACK, "Arial", 256, 330, 250);
-
-        if (current_state == GameOver)
-            draw_text("Game Over!", COLOR_RED, "Arial", 50, 330, 250);
 
         if (current_state == GameOver)
         {
