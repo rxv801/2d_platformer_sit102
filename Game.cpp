@@ -4,25 +4,33 @@ using std::to_string;
 string text;
 int current_level = 1;
 bool level_needs_loading = true;
+
+/**
+ * @brief Represents the player in the game.
+ */
 struct Player
 {
-    int x, y, vx, vy, width, height;
-    bool on_ground;
+    int x, y, vx, vy, width, height; ///< Position, velocity, and dimensions of the player.
+    bool on_ground; ///< Indicates whether the player is on the ground.
 };
 
-// created an enemy struct to hold enemy properties
+/**
+ * @brief Represents an enemy in the game.
+ */
 struct Enemy
 {
-    int x, y, vx, vy, width, height;
-    bool on_ground;
+    int x, y, vx, vy, width, height; ///< Position, velocity, and dimensions of the enemy.
+    bool on_ground; ///< Indicates whether the enemy is on the ground.
 
-    int shadow_left_x, shadow_left_y;
+    int shadow_left_x, shadow_left_y; ///< Shadow properties for collision detection.
     int shadow_left_width, shadow_left_height;
 
     int shadow_right_x, shadow_right_y;
     int shadow_right_width, shadow_right_height;
 
-    // Default constructor to initialize properties
+    /**
+     * @brief Default constructor to initialize enemy properties.
+     */
     Enemy()
         : x(0), y(0), vx(1), vy(0), width(40), height(40), on_ground(false),
           shadow_left_x(0), shadow_left_y(0), shadow_left_width(2), shadow_left_height(2),
@@ -31,37 +39,67 @@ struct Enemy
     }
 };
 
+/**
+ * @brief Represents a platform in the game.
+ */
 struct Platform
 {
-    int x, y, width, height;
+    int x, y, width, height; ///< Position and dimensions of the platform.
 };
 
+/**
+ * @brief Represents the goal in the game.
+ */
 struct Goal
 {
-    int x, y, width, height;
+    int x, y, width, height; ///< Position and dimensions of the goal.
 };
 
+/**
+ * @brief Represents the state of the game.
+ */
 enum GameState
 {
-    Playing,
-    Win,
-    GameOver
+    Playing, ///< The game is currently being played.
+    Win,     ///< The player has won the game.
+    GameOver ///< The player has lost the game.
 };
 
 GameState current_state = Playing;
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
-const int NUM_PLATFORMS = 4;
-const int NUM_ENEMIES = 1; // Define the number of enemies
+const int SCREEN_WIDTH = 800; ///< Width of the game window.
+const int SCREEN_HEIGHT = 600; ///< Height of the game window.
+const int NUM_PLATFORMS = 4; ///< Number of platforms in the game.
+const int NUM_ENEMIES = 1; ///< Number of enemies in the game.
 
 Platform platforms[NUM_PLATFORMS];
 
+/**
+ * @brief Checks for axis-aligned bounding box (AABB) collision between two rectangles.
+ * 
+ * @param x1 X-coordinate of the first rectangle.
+ * @param y1 Y-coordinate of the first rectangle.
+ * @param w1 Width of the first rectangle.
+ * @param h1 Height of the first rectangle.
+ * @param x2 X-coordinate of the second rectangle.
+ * @param y2 Y-coordinate of the second rectangle.
+ * @param w2 Width of the second rectangle.
+ * @param h2 Height of the second rectangle.
+ * @return true if the rectangles collide, false otherwise.
+ */
 bool aabb_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
     return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
 }
 
+/**
+ * @brief Handles the behavior and movement of an enemy.
+ * 
+ * @param e The enemy to handle.
+ * @param platforms Array of platforms in the game.
+ * @param platform_count Number of platforms in the game.
+ * @param player The player in the game.
+ */
 void handle_enemy(Enemy &e, const Platform *platforms, int platform_count, const Player &player)
 {
     // Apply gravity to the enemy
@@ -129,27 +167,38 @@ void handle_enemy(Enemy &e, const Platform *platforms, int platform_count, const
         current_state = GameOver;
     }
 
-    // Draw the enemy
-    fill_rectangle(COLOR_RED, e.x, e.y, e.width, e.height); // Render the enemy
+    
 }
 
+/**
+ * @brief Handles collisions between the player, platforms, and the goal.
+ * 
+ * @param player The player in the game.
+ * @param platforms Array of platforms in the game.
+ * @param platform_count Number of platforms in the game.
+ * @param goal The goal in the game.
+ */
 void check_collisions(Player &player, Platform *platforms, int platform_count, Goal &goal)
 {
-    player.on_ground = false;
+    player.on_ground = false; // Reset the on_ground flag before checking collisions
+
+    // Check collision with platforms
     for (int i = 0; i < platform_count; ++i)
     {
         Platform &plat = platforms[i];
         if (aabb_collision(player.x, player.y, player.width, player.height, plat.x, plat.y, plat.width, plat.height))
         {
+            // Clamp the player to the top of the platform if falling
             if (player.vy >= 0)
             {
-                player.y = plat.y - player.height;
-                player.vy = 0;
-                player.on_ground = true;
+                player.y = plat.y - player.height; // Position player on top of the platform
+                player.vy = 0; // Stop vertical movement
+                player.on_ground = true; // Mark player as on the ground
             }
         }
     }
 
+    // Check collision with the goal
     if (aabb_collision(player.x, player.y, player.width, player.height, goal.x, goal.y, goal.width, goal.height))
     {
         level_needs_loading = true;
@@ -161,19 +210,28 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
         }
         else if (current_level == 1)
         {
-            player = {-15, 400, 0, 0, 40, 40, false};
+            player = {-15, 400, 0, 0, 30, 40, false}; // Reset player position for level 1
         }
         else if (current_level == 2)
         {
-            player = {-15, 300, 0, 0, 40, 40, false};
+            player = {-15, 300, 0, 0, 30, 40, false}; // Reset player position for level 2
         }
         else if (current_level == 3)
         {
-            player = {100, 200, 0, 0, 40, 40, false};
+            player = {100, 200, 0, 0, 30, 40, false}; // Reset player position for level 3
         }
     }
 }
 
+/**
+ * @brief Draws the game elements, including the player, platforms, goal, and enemy.
+ * 
+ * @param player The player in the game.
+ * @param platforms Array of platforms in the game.
+ * @param platform_count Number of platforms in the game.
+ * @param goal The goal in the game.
+ * @param enemy The enemy in the game.
+ */
 void draw_game(const Player &player, const Platform *platforms, int platform_count, const Goal &goal, const Enemy &enemy)
 {
     draw_bitmap(bitmap_named("background"), 0, 0);
@@ -201,17 +259,32 @@ void draw_game(const Player &player, const Platform *platforms, int platform_cou
 
     for (int i = 0; i < platform_count; ++i)
     {
-        draw_bitmap(bitmap_named("platform"), platforms[i].x, platforms[i].y - 8);
+        draw_bitmap(bitmap_named("platform"), platforms[i].x-10, platforms[i].y - 8);
     }
 
     if (current_level == 3)
     {
         draw_bitmap(bitmap_named("goal"), goal.x, goal.y + 5);
     }
+
+    // debugging
+    for (int i = 0; i < platform_count; ++i)
+    {
+
+        draw_rectangle(COLOR_RED, platforms[i].x, platforms[i].y, platforms[i].width, platforms[i].height);
+    }
+
+    draw_rectangle(COLOR_RED, player.x, player.y, player.width, player.height); // drew player for testing
+    // Draw the enemy
+    fill_rectangle(COLOR_RED, enemy.x, enemy.y, enemy.width, enemy.height); // Render the enemy
+
 }
 
-void handle_input(Player &p)
+
+
+void handle_player(Player &p, Platform *platforms, int platform_count, Goal &goal)
 {
+
     if (key_down(LEFT_KEY))
         p.vx = -5;
     else if (key_down(RIGHT_KEY))
@@ -221,27 +294,58 @@ void handle_input(Player &p)
 
     if (key_typed(SPACE_KEY) && p.on_ground)
         p.vy = -15;
-}
 
-void apply_physics(Player &p)
-{
+    //Apply gravity and physics
     p.vy += 1;
     p.y += p.vy;
     p.x += p.vx;
 
-    if (p.x < 0)
-    {
-        p.x = 0;
-    }
-    if (p.x + p.width > SCREEN_WIDTH)
-        p.x = SCREEN_WIDTH - p.width;
+    //Screen boundaries
+    if (p.x < 0) p.x = 0;
+    if (p.x + p.width > SCREEN_WIDTH) p.x = SCREEN_WIDTH - p.width;
 
     if (p.y + p.height >= SCREEN_HEIGHT)
     {
         current_state = GameOver;
         return;
     }
+
+    p.on_ground = false;
+
+    //Platform collision
+    for (int i = 0; i < platform_count; ++i)
+    {
+        Platform &plat = platforms[i];
+        if (aabb_collision(p.x, p.y, p.width, p.height, plat.x, plat.y, plat.width, plat.height))
+        {
+            if (p.vy >= 0)
+            {
+                p.y = plat.y - p.height;
+                p.vy = 0;
+                p.on_ground = true;
+            }
+        }
+    }
+
+    //Goal collision
+    if (aabb_collision(p.x, p.y, p.width, p.height, goal.x, goal.y, goal.width, goal.height))
+    {
+        level_needs_loading = true;
+        current_level++;
+
+        if (current_level > 3)
+        {
+            current_state = Win;
+        }
+        else
+        {
+            if (current_level == 1) p = {-15, 400, 0, 0, 30, 40, false};
+            else if (current_level == 2) p = {-15, 300, 0, 0, 30, 40, false};
+            else if (current_level == 3) p = {100, 200, 0, 0, 30, 40, false};
+        }
+    }
 }
+
 
 void load_bitmaps()
 {
@@ -291,7 +395,7 @@ void load_level(int level, Goal &goal, Platform *platforms, Enemy *enemies)
     }
     else if (level == 3)
     {
-        goal = {772, 220, 28, 40};
+        goal = {772, 250, 28, 40};
 
         enemies[0].x = 500;
         enemies[0].y = 200;
@@ -335,7 +439,7 @@ int main()
 
     music game_music = load_music("background_music", "Resources/super-mario-bros-music.mp3");
     Player player;
-    player = {-15, 400, 0, 0, 40, 40, false};
+    player = {-15, 400, 0, 0, 30, 40, false}; // Width reverted to 40
     Goal goal;
     Platform platforms[NUM_PLATFORMS];
 
@@ -347,9 +451,8 @@ int main()
 
         if (current_state == Playing)
         {
-            handle_input(player);
-            apply_physics(player);
-            check_collisions(player, platforms, NUM_PLATFORMS, goal);
+            handle_player(player, platforms, NUM_PLATFORMS, goal);
+
 
             // Handle each enemy
             for (int i = 0; i < NUM_ENEMIES; ++i)
@@ -363,7 +466,7 @@ int main()
             current_state = Playing;
             current_level = 1;
             level_needs_loading = true;
-            player = {-15, 400, 0, 0, 40, 40, false};
+            player = {-15, 400, 0, 0, 30, 40, false}; // Width reverted to 40
         }
 
         if (level_needs_loading)
@@ -375,7 +478,6 @@ int main()
         clear_screen(COLOR_SKY_BLUE);
 
         draw_game(player, platforms, NUM_PLATFORMS, goal, enemies[0]);
-
 
         if (current_state == Win)
             draw_text("You Win!", COLOR_BLACK, "Arial", 256, 330, 250);
