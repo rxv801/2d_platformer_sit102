@@ -1,9 +1,10 @@
 #include "splashkit.h"
 using std::to_string;
 
-string text;
-int current_level = 1;
-bool level_needs_loading = true;
+// Global variables
+string text; // Text for debugging or display purposes
+int current_level = 1; // Tracks the current level of the game
+bool level_needs_loading = true; // Flag to indicate if a new level needs to be loaded
 
 /**
  * @brief Represents the player in the game.
@@ -21,6 +22,7 @@ struct Enemy
 {
     int x, y, vx, vy, width, height; ///< Position, velocity, and dimensions of the enemy.
     bool on_ground; ///< Indicates whether the enemy is on the ground.
+    bool is_alive; ///< Indicates whether the enemy is alive.
 
     int shadow_left_x, shadow_left_y; ///< Shadow properties for collision detection.
     int shadow_left_width, shadow_left_height;
@@ -32,11 +34,10 @@ struct Enemy
      * @brief Default constructor to initialize enemy properties.
      */
     Enemy()
-        : x(0), y(0), vx(1), vy(0), width(40), height(40), on_ground(false),
-          shadow_left_x(0), shadow_left_y(0), shadow_left_width(2), shadow_left_height(2),
-          shadow_right_x(0), shadow_right_y(0), shadow_right_width(2), shadow_right_height(2)
-    {
-    }
+    : x(0), y(0), vx(1), vy(0), width(30), height(30), on_ground(false), is_alive(true),
+      shadow_left_x(0), shadow_left_y(0), shadow_left_width(2), shadow_left_height(2),
+      shadow_right_x(0), shadow_right_y(0), shadow_right_width(2), shadow_right_height(2)
+    {}
 };
 
 /**
@@ -61,22 +62,23 @@ struct Goal
 enum GameState
 {
     Playing, ///< The game is currently being played.
-    Win,     ///< The player has won the game.
+    Win, ///< The player has won the game.
     GameOver ///< The player has lost the game.
 };
 
-GameState current_state = Playing;
+GameState current_state = Playing; // Tracks the current state of the game
 
+// Constants for screen dimensions and game elements
 const int SCREEN_WIDTH = 800; ///< Width of the game window.
 const int SCREEN_HEIGHT = 600; ///< Height of the game window.
 const int NUM_PLATFORMS = 4; ///< Number of platforms in the game.
 const int NUM_ENEMIES = 1; ///< Number of enemies in the game.
 
-Platform platforms[NUM_PLATFORMS];
+Platform platforms[NUM_PLATFORMS]; // Array to store platforms
 
 /**
  * @brief Checks for axis-aligned bounding box (AABB) collision between two rectangles.
- * 
+ *
  * @param x1 X-coordinate of the first rectangle.
  * @param y1 Y-coordinate of the first rectangle.
  * @param w1 Width of the first rectangle.
@@ -94,13 +96,13 @@ bool aabb_collision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int 
 
 /**
  * @brief Handles the behavior and movement of an enemy.
- * 
+ *
  * @param e The enemy to handle.
  * @param platforms Array of platforms in the game.
  * @param platform_count Number of platforms in the game.
  * @param player The player in the game.
  */
-void handle_enemy(Enemy &e, const Platform *platforms, int platform_count, const Player &player)
+void handle_enemy(Enemy &e, const Platform *platforms, int platform_count, Player &player)
 {
     // Apply gravity to the enemy
     e.vy += 1;
@@ -162,17 +164,26 @@ void handle_enemy(Enemy &e, const Platform *platforms, int platform_count, const
     }
 
     // Game Over if enemy collides with the player
+    if (!e.is_alive) return;
+
+    // Stomp logic
     if (aabb_collision(e.x, e.y, e.width, e.height, player.x, player.y, player.width, player.height))
     {
-        current_state = GameOver;
+        if (player.y + player.height <= e.y + 10) // check if player is above
+        {
+            e.is_alive = false;
+            player.vy = -10; // give player bounce after stomp
+        }
+        else
+        {
+            current_state = GameOver;
+        }
     }
-
-    
 }
 
 /**
  * @brief Handles collisions between the player, platforms, and the goal.
- * 
+ *
  * @param player The player in the game.
  * @param platforms Array of platforms in the game.
  * @param platform_count Number of platforms in the game.
@@ -192,8 +203,8 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
             if (player.vy >= 0)
             {
                 player.y = plat.y - player.height; // Position player on top of the platform
-                player.vy = 0; // Stop vertical movement
-                player.on_ground = true; // Mark player as on the ground
+                player.vy = 0;                     // Stop vertical movement
+                player.on_ground = true;           // Mark player as on the ground
             }
         }
     }
@@ -225,7 +236,7 @@ void check_collisions(Player &player, Platform *platforms, int platform_count, G
 
 /**
  * @brief Draws the game elements, including the player, platforms, goal, and enemy.
- * 
+ *
  * @param player The player in the game.
  * @param platforms Array of platforms in the game.
  * @param platform_count Number of platforms in the game.
@@ -236,52 +247,44 @@ void draw_game(const Player &player, const Platform *platforms, int platform_cou
 {
     draw_bitmap(bitmap_named("background"), 0, 0);
 
-    for (int i = 0; i < NUM_ENEMIES; ++i)
-    {
-        fill_rectangle(COLOR_RED, enemy.x, enemy.y, enemy.width, enemy.height); // drew enemy for testing
-    }
+    // Draw the enemy bitmap
+    if (enemy.is_alive)
+        draw_bitmap(bitmap_named("enemy"), enemy.x, enemy.y); // Draw the enemy bitmap
+
+    // Remove the debugging rectangle for the enemy
+    // fill_rectangle(COLOR_RED, enemy.x, enemy.y, enemy.width, enemy.height); // Debugging rectangle for enemy
+
+    // Draw the player based on its state
     if (player.vx > 0 && player.on_ground)
         draw_bitmap(bitmap_named("player_right"), player.x, player.y);
-
     else if (player.vx < 0 && player.on_ground)
         draw_bitmap(bitmap_named("player_left"), player.x, player.y);
-
     else if (player.on_ground == false && player.vx > 0)
         draw_bitmap(bitmap_named("player_in_air_right"), player.x, player.y);
     else if (player.on_ground == false && player.vx < 0)
         draw_bitmap(bitmap_named("player_in_air_left"), player.x, player.y);
-
     else if (player.on_ground == false && player.vx == 0)
         draw_bitmap(bitmap_named("player_in_air_right"), player.x, player.y);
-
     else
         draw_bitmap(bitmap_named("player_still"), player.x, player.y);
 
+    // Draw platforms
     for (int i = 0; i < platform_count; ++i)
     {
-        draw_bitmap(bitmap_named("platform"), platforms[i].x-10, platforms[i].y - 8);
+        draw_bitmap(bitmap_named("platform"), platforms[i].x - 10, platforms[i].y - 8);
     }
 
+    // Draw the goal
     if (current_level == 3)
-    {
         draw_bitmap(bitmap_named("goal"), goal.x, goal.y + 5);
-    }
 
-    // debugging
+    // Debugging: Draw player and platform boundaries
+    draw_rectangle(COLOR_RED, player.x, player.y, player.width, player.height); // Debugging player position
     for (int i = 0; i < platform_count; ++i)
     {
-
         draw_rectangle(COLOR_RED, platforms[i].x, platforms[i].y, platforms[i].width, platforms[i].height);
     }
-
-    draw_rectangle(COLOR_RED, player.x, player.y, player.width, player.height); // drew player for testing
-    // Draw the enemy
-    fill_rectangle(COLOR_RED, enemy.x, enemy.y, enemy.width, enemy.height); // Render the enemy
-    draw_bitmap(bitmap_named("enemy"), enemy.x, enemy.y); // Draw the enemy bitmap
-
 }
-
-
 
 void handle_player(Player &p, Platform *platforms, int platform_count, Goal &goal)
 {
@@ -296,14 +299,16 @@ void handle_player(Player &p, Platform *platforms, int platform_count, Goal &goa
     if (key_typed(SPACE_KEY) && p.on_ground)
         p.vy = -15;
 
-    //Apply gravity and physics
+    // Apply gravity and physics
     p.vy += 1;
     p.y += p.vy;
     p.x += p.vx;
 
-    //Screen boundaries
-    if (p.x < 0) p.x = 0;
-    if (p.x + p.width > SCREEN_WIDTH) p.x = SCREEN_WIDTH - p.width;
+    // Screen boundaries
+    if (p.x < 0)
+        p.x = 0;
+    if (p.x + p.width > SCREEN_WIDTH)
+        p.x = SCREEN_WIDTH - p.width;
 
     if (p.y + p.height >= SCREEN_HEIGHT)
     {
@@ -313,7 +318,7 @@ void handle_player(Player &p, Platform *platforms, int platform_count, Goal &goa
 
     p.on_ground = false;
 
-    //Platform collision
+    // Platform collision
     for (int i = 0; i < platform_count; ++i)
     {
         Platform &plat = platforms[i];
@@ -328,7 +333,7 @@ void handle_player(Player &p, Platform *platforms, int platform_count, Goal &goa
         }
     }
 
-    //Goal collision
+    // Goal collision
     if (aabb_collision(p.x, p.y, p.width, p.height, goal.x, goal.y, goal.width, goal.height))
     {
         level_needs_loading = true;
@@ -340,13 +345,15 @@ void handle_player(Player &p, Platform *platforms, int platform_count, Goal &goa
         }
         else
         {
-            if (current_level == 1) p = {-15, 400, 0, 0, 30, 40, false};
-            else if (current_level == 2) p = {-15, 300, 0, 0, 30, 40, false};
-            else if (current_level == 3) p = {100, 200, 0, 0, 30, 40, false};
+            if (current_level == 1)
+                p = {-15, 400, 0, 0, 30, 40, false};
+            else if (current_level == 2)
+                p = {-15, 300, 0, 0, 30, 40, false};
+            else if (current_level == 3)
+                p = {100, 200, 0, 0, 30, 40, false};
         }
     }
 }
-
 
 void load_bitmaps()
 {
@@ -367,13 +374,9 @@ void load_level(int level, Goal &goal, Platform *platforms, Enemy *enemies)
     {
         goal = {772, 0, 28, 300};
 
-        enemies[0].x = 350;
+        enemies[0].x = 350; // Set enemy position
         enemies[0].y = 350;
-        enemies[0].vx = 1; // Set horizontal velocity to 1
-        enemies[0].vy = 0;
-        enemies[0].width = 40;
-        enemies[0].height = 40;
-        enemies[0].on_ground = false;
+        enemies[0].is_alive = true;
 
         platforms[0] = {-15, 500, 180, 67};
         platforms[1] = {300, 400, 180, 67};
@@ -383,13 +386,9 @@ void load_level(int level, Goal &goal, Platform *platforms, Enemy *enemies)
     {
         goal = {772, 0, 28, 300};
 
-        enemies[0].x = 450;
+        enemies[0].x = 450; // Set enemy position
         enemies[0].y = 350;
-        enemies[0].vx = 1; // Set horizontal velocity to 1
-        enemies[0].vy = 0;
-        enemies[0].width = 40;
-        enemies[0].height = 40;
-        enemies[0].on_ground = false;
+        enemies[0].is_alive = true;
 
         platforms[0] = {-15, 300, 180, 67};
         platforms[1] = {350, 350, 180, 67};
@@ -399,18 +398,14 @@ void load_level(int level, Goal &goal, Platform *platforms, Enemy *enemies)
     {
         goal = {772, 250, 28, 40};
 
-        enemies[0].x = 500;
+        enemies[0].x = 500; // Set enemy position
         enemies[0].y = 200;
-        enemies[0].vx = 1; // Set horizontal velocity to 1
-        enemies[0].vy = 0;
-        enemies[0].width = 40;
-        enemies[0].height = 40;
-        enemies[0].on_ground = false;
+        enemies[0].is_alive = true;
 
         platforms[0] = {-15, 250, 180, 67};
-        platforms[1] = {300, 400, 180, 67};
-        platforms[2] = {615, 300, 180, 67};
+        platforms[2] = {650, 250, 180, 67};
     }
+    
     else
     {
         current_state = Win;
@@ -454,7 +449,6 @@ int main()
         if (current_state == Playing)
         {
             handle_player(player, platforms, NUM_PLATFORMS, goal);
-
 
             // Handle each enemy
             for (int i = 0; i < NUM_ENEMIES; ++i)
