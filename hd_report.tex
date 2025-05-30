@@ -30,6 +30,13 @@ This report is a summary and refelection on my 2d platformer game which is inspi
 The game has various features such as player moverment towards left and right on the ground and jumping. There is gravity physics which pulls the player down when it is in the air. Moreover, collisons are detected using AABB (Axis-Aligned Bounding Box) method, which checks if the player is colliding with the ground or the goal post. Moreover, the game simulates level progression by using a invisible goal post which is placed at the end of the level and when that post is reached the platforms are replaced and their coordinates are changed to create a new frame. This can made to look like a continuous level progression by using the same platforms coordinates in ending of previous level and starting of the next level.
 Moreover, the game uses variosu UI elements for the paltforms, player, goal post and the ground. The player is drawn using a bitmap image of mario, and it changed according to the action player character is doing. On top of it,the player can reload the game from the very beginning by pression the space key, which resets the game and music plays play throughut the game when the game state is PLAYING.
 
+\section{Added Features}
+\begin{itemize}
+    \item \textbf{Bitmap Images:} The game uses bitmap images for the player, platforms, goals and the enemies. And it has different images for the player character based on the action it is doing.
+    \item \textbf{Better music handling:} In the game has a music loop which repetedly playes the music and stops it when game is over.
+    \item \textbf{Enemy AI:} The game has an enemy which moves back and forth on the platform and if the player collides with it, the game is lost. The enemy is checks if it has a place to step and moves back if there is no place in front of it. Player can jump and stomp on the enemies to make them despawn  
+\end{itemize}
+
 \section{Evidence of tutor interaction}
 \begin{figure}[!ht]
     \centering
@@ -65,6 +72,8 @@ Before the I made my game for the HD I had to make a small scale program of the 
 \end{figure}
 
 \clearpage
+\section{Bonus objective repository}
+You can view my repository and the incremental changes I made by clicking: \href{https://youtu.be/boPe4kzw5Eo}{HERE}.
 \section{Demonstration Video}
 
 You can watch the demonstration video here: \href{https://youtu.be/boPe4kzw5Eo}{Click to watch on YouTube}.

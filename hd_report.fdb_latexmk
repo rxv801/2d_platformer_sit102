@@ -1,12 +1,14 @@
 # Fdb version 4
-["pdflatex"] 1748177795.01493 "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/H1/hd_report.tex" "hd_report.pdf" "hd_report" 1748177795.89299 0
+["pdflatex"] 1748602403.31232 "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/H1/hd_report.tex" "hd_report.pdf" "hd_report" 1748602404.748 0
   "/Users/rex/Documents/ScreenShots/Screenshot 2025-05-25 at 15.40.47.png" 1748151652.87231 208006 79ffcacf769d624f5a57ed54cd741ccb ""
   "/Users/rex/Documents/ScreenShots/Screenshot 2025-05-25 at 22.19.11.png" 1748175555.08835 334171 cba79217a2ccdcaaa3a7d66149cf3738 ""
   "/Users/rex/Documents/ScreenShots/Screenshot 2025-05-25 at 22.22.57.png" 1748175780.95188 296818 3d01620afbe86bf405e79d15b45a97bf ""
   "/Users/rex/Documents/ScreenShots/Screenshot 2025-05-25 at 22.32.10.png" 1748176335.71249 329803 7e2dfa75c23751a777a2537144874889 ""
-  "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/H1/hd_report.tex" 1748177794.83076 4797 c432a56472a35ec56130ae33f97f19dc ""
+  "/Users/rex/Documents/Study_Material/SIT102_Intro_to_programming/H1/hd_report.tex" 1748602403.13208 5652 441e04579178106da0a01ca768fed8a5 ""
+  "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1741388039 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/map/fontname/texfonts.map" 1741388039 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/map/pdftex/updmap/pdftex.map" 1741388039 5466553 2748998d7db8078826afa1f272036265 ""
+  "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1741388039 1536 02c06700a42be0f5a28664c7273f82e7 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1741388039 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1741388039 1324 c910af8c371558dc20f2d7822f66fe64 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/tfm/public/cm/cmmi12.tfm" 1741388039 1524 4414a8315f39513458b80dfc63bff03a ""
@@ -25,6 +27,7 @@
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1741388039 35752 024fb6c41858982481f6968b5fc26508 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb" 1741388039 32722 d7379af29a190c3f453aba36302ff5a9 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb" 1741388039 32362 179c33bbf43f19adbb3825bb4e36e57a ""
+  "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb" 1741388039 145929 f25e56369a345c4ff583b067cd87ce8e ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1741388039 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/atbegshi/atbegshi.sty" 1741388039 24708 5584a51a7101caf7e6bbf1fc27d8f7b1 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty" 1741388039 40635 c40361e206be584d448876bba8a64a3b ""
@@ -75,9 +78,9 @@
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/web2c/texmf.cnf" 1741388039 42151 79f67285bdd95beca4d137b380b4b9e5 ""
   "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-var/web2c/pdftex/pdflatex.fmt" 1741388039 3346141 1288109d02d1c772df65535881471649 ""
   "Screenshot 2025-05-25 at 21.54.15.png" 1748174062.06371 122606 07df0106e696de5d0be7c8ed2924e267 ""
-  "hd_report.aux" 1748177795.86184 4111 b736ab9e14a82273b89a718cc97e3317 "pdflatex"
-  "hd_report.tex" 1748177794.83076 4797 c432a56472a35ec56130ae33f97f19dc ""
-  "hd_report.toc" 1748177795.86273 395 f0ab3b8ff9813750089751458be773ba "pdflatex"
+  "hd_report.aux" 1748602404.69302 4911 b120b13ed74e2890e42ca28dbe1f06d8 "pdflatex"
+  "hd_report.tex" 1748602403.13208 5652 441e04579178106da0a01ca768fed8a5 ""
+  "hd_report.toc" 1748602404.69455 547 6d76ba9fea247131977ca747f84867ca "pdflatex"
   (generated)
   "hd_report.aux"
   "hd_report.log"

@@ -181,58 +181,6 @@ void handle_enemy(Enemy &e, const Platform *platforms, int platform_count, Playe
     }
 }
 
-/**
- * @brief Handles collisions between the player, platforms, and the goal.
- *
- * @param player The player in the game.
- * @param platforms Array of platforms in the game.
- * @param platform_count Number of platforms in the game.
- * @param goal The goal in the game.
- */
-void check_collisions(Player &player, Platform *platforms, int platform_count, Goal &goal)
-{
-    player.on_ground = false; // Reset the on_ground flag before checking collisions
-
-    // Check collision with platforms
-    for (int i = 0; i < platform_count; ++i)
-    {
-        Platform &plat = platforms[i];
-        if (aabb_collision(player.x, player.y, player.width, player.height, plat.x, plat.y, plat.width, plat.height))
-        {
-            // Clamp the player to the top of the platform if falling
-            if (player.vy >= 0)
-            {
-                player.y = plat.y - player.height; // Position player on top of the platform
-                player.vy = 0;                     // Stop vertical movement
-                player.on_ground = true;           // Mark player as on the ground
-            }
-        }
-    }
-
-    // Check collision with the goal
-    if (aabb_collision(player.x, player.y, player.width, player.height, goal.x, goal.y, goal.width, goal.height))
-    {
-        level_needs_loading = true;
-        current_level++;
-
-        if (current_level > 3)
-        {
-            current_state = Win;
-        }
-        else if (current_level == 1)
-        {
-            player = {-15, 400, 0, 0, 30, 40, false}; // Reset player position for level 1
-        }
-        else if (current_level == 2)
-        {
-            player = {-15, 300, 0, 0, 30, 40, false}; // Reset player position for level 2
-        }
-        else if (current_level == 3)
-        {
-            player = {100, 200, 0, 0, 30, 40, false}; // Reset player position for level 3
-        }
-    }
-}
 
 /**
  * @brief Draws the game elements, including the player, platforms, goal, and enemy.
@@ -396,9 +344,9 @@ void load_level(int level, Goal &goal, Platform *platforms, Enemy *enemies)
     }
     else if (level == 3)
     {
-        goal = {772, 250, 28, 40};
+        goal = {772, 225, 28, 40};
 
-        enemies[0].x = 500; // Set enemy position
+        enemies[0].x = 470; // Set enemy position
         enemies[0].y = 200;
         enemies[0].is_alive = true;
 
