@@ -277,6 +277,7 @@ void draw_game(const Player &player, const Platform *platforms, int platform_cou
     draw_rectangle(COLOR_RED, player.x, player.y, player.width, player.height); // drew player for testing
     // Draw the enemy
     fill_rectangle(COLOR_RED, enemy.x, enemy.y, enemy.width, enemy.height); // Render the enemy
+    draw_bitmap(bitmap_named("enemy"), enemy.x, enemy.y); // Draw the enemy bitmap
 
 }
 
@@ -357,6 +358,7 @@ void load_bitmaps()
     load_bitmap("background", "Resources/the-skyboxes-of-super-mario-sunshine-are-beautiful-v0-mldawocl4wqe1.png");
     load_bitmap("player_in_air_right", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38.png");
     load_bitmap("player_in_air_left", "Resources/Screenshot 2025-05-25 at 14.51 Background Removed.38 copy.png");
+    load_bitmap("enemy", "Resources/Goomba.png");
 }
 
 void load_level(int level, Goal &goal, Platform *platforms, Enemy *enemies)
